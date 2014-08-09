@@ -166,6 +166,8 @@ aside {
 
 <script src="crossfilter.v1.min.js"></script>
 <script src="d3.v3.min.js"></script>
+<script src="jquery-2.1.1.js"></script>
+<script src="jquery.dataTables.min.js"></script>
 <script>
 
 // (It's CSV, but GitHub Pages only gzip's JSON at the moment.)
@@ -205,6 +207,7 @@ d3.csv("pt.csv", function(error, pts) {
   // Create the crossfilter for the relevant dimensions and groups.
   var pt = crossfilter(pts),
       all = pt.groupAll(),
+      ptid = pt.dimension(function(d){ return d.PID}),
       hgba1c = pt.dimension(function(d) { 
         return Math.max(-10-100, Math.min(15, clean(d.hgba1c)))}),
       hgba1cs = hgba1c.group(function(d) { return Math.floor((clean(d)/.5))*.5; });
@@ -321,7 +324,7 @@ d3.csv("pt.csv", function(error, pts) {
   // Whenever the brush moves, re-rendering everything.
   function renderAll() {
     chart.each(render);
-    // list.each(render);
+    list.each(render);
     d3.select("#active").text(formatNumber(all.value()));
   }
 
@@ -345,57 +348,13 @@ d3.csv("pt.csv", function(error, pts) {
   };
 
   function ptList(div) {
-    var flightsByDate = nestByDate.entries(date.top(40));
-
-    div.each(function() {
-      var date = d3.select(this).selectAll(".date")
-          .data(flightsByDate, function(d) { return d.key; });
-
-      date.enter().append("div")
-          .attr("class", "date")
-        .append("div")
-          .attr("class", "day")
-          .text(function(d) { return formatDate(d.values[0].date); });
-
-      date.exit().remove();
-
-      var flight = date.order().selectAll(".flight")
-          .data(function(d) { return d.values; }, function(d) { return d.index; });
-
-      var flightEnter = flight.enter().append("div")
-          .attr("class", "flight");
-
-      flightEnter.append("div")
-          .attr("class", "time")
-          .text(function(d) { return formatTime(d.date); });
-
-      flightEnter.append("div")
-          .attr("class", "origin")
-          .text(function(d) { return d.origin; });
-
-      flightEnter.append("div")
-          .attr("class", "destination")
-          .text(function(d) { return d.destination; });
-
-      flightEnter.append("div")
-          .attr("class", "distance")
-          .text(function(d) { return formatNumber(d.distance) + " mi."; });
-
-      flightEnter.append("div")
-          .attr("class", "delay")
-          .classed("early", function(d) { return d.delay < 0; })
-          .text(function(d) { return formatChange(d.delay) + " min."; });
-
-      flight.exit().remove();
-
-      flight.order();
-    });
+    var patients = ptid.top(100);
   }
 
   function barChart() {
     if (!barChart.id) barChart.id = 0;
 
-    var margin = {top: 10, right: 10, bottom: 20, left: 10},
+    var margin = {top: 10, right: 10, bottom: 80, left: 10},
         x,
         y = d3.scale.linear().range([100, 0]),
         id = barChart.id++,
@@ -405,6 +364,7 @@ d3.csv("pt.csv", function(error, pts) {
         dimension,
         group,
         round;
+
 
     function chart(div) {
       var width = x.range()[1],
@@ -450,6 +410,23 @@ d3.csv("pt.csv", function(error, pts) {
               .attr("transform", "translate(0," + height + ")")
               .call(axis);
 
+          var topLeft = g.append("g")
+
+          // topLeft.append("circle")
+          //     .attr("cx", 5)
+          //     .attr("cy", 5)
+          //     .datum(group.all())
+          //     .attr("r", function(d) { return d[0].value / 75})
+          
+          topLeft.append("text")
+              .attr("x", 0)
+              .attr("y", height + 40)
+              .datum(group.all())
+              .text(function(d) {
+                return (all.value() - d[0].value) / all.value() * 100 + "%"})
+
+
+
           // Initialize the brush component with pretty resize handles.
           var gBrush = g.append("g").attr("class", "brush").call(brush);
           gBrush.selectAll("rect").attr("height", height);
@@ -474,6 +451,9 @@ d3.csv("pt.csv", function(error, pts) {
         }
 
         g.selectAll(".bar").attr("d", barPath);
+
+
+
       });
 
       function barPath(groups) {
