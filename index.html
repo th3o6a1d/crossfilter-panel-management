@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-<title>Crossfilter</title>
+<title>Virtual Practice</title>
 <style>
-
 
 .chart {
   display: inline-block;
   height: 160px;
+  width: 350px;
   margin-bottom: 20px;
 }
 
@@ -21,7 +21,7 @@
 }
 
 .foreground.bar {
-  fill: steelblue;
+  fill: green;
 }
 
 .axis path, .axis line {
@@ -44,91 +44,11 @@
   stroke: #666;
 }
 
-#hgba1c-chart {
-  width: 330px;
-}
-
-#bmi-chart {
-  width: 400px;
-}
-
-#ldl-chart {
-  width: 330px;
-}
-
-#hdl-chart {
-  width: 330px;
-}
-#tri-chart {
-  width: 300px;
-}
-#sys-chart {
-  width: 330px;
-}
-#dia-chart {
-  width: 260px;
-}
-#pulse-chart {
-  width: 330px;
-}
-#distance-chart {
-  width: 420px;
-}
-
-#date-chart {
-  width: 920px;
-}
-
-#pt-list {
-  min-height: 1024px;
-}
-
-#pt-list .date,
-#pt-list .day {
-  margin-bottom: .4em;
-}
-
-#pt-list .flight {
-  line-height: 1.5em;
-  background: #eee;
-  width: 640px;
-  margin-bottom: 1px;
-}
-
-#pt-list .time {
-  color: #999;
-}
-
-#pt-list .flight div {
-  display: inline-block;
-  width: 100px;
-}
-
-#pt-list div.distance,
-#pt-list div.delay {
-  width: 160px;
-  padding-right: 10px;
-  text-align: right;
-}
-
-#pt-list .early {
-  color: green;
-}
-
-aside {
-  position: absolute;
-  left: 740px;
-  font-size: smaller;
-  width: 220px;
-}
-
 </style>
 
 <!-- <p>Headers: PID,Age,Gender,source_of_payment,race,Diabetic,Hypertensive,Obese,has_anemia,has_asthma,has_chf,has_crf,has_cva,has_copd,annual_household_income,hgba1c,bmi,ht,wt,plat,rbc,wbc,triglycerides,ldl,hdl,diastolic,systolic,pulse</p>
  -->
 <!-- <p>Some questions to consider: How does time-of-day correlate with <a href="javascript:filter([null, [100, 150], null, null])">arrival delay</a>? Are <a href="javascript:filter([null, null, [1700, 2000], null])">longer</a> or <a href="javascript:filter([null, null, [0, 300], null])">shorter</a> flights more likely to arrive early? What happened on <a href="javascript:filter([null, [80, 150], null, [new Date(2001, 0, 12), new Date(2001, 0, 13)]])">January 12</a>? How do flight patterns differ between <a href="javascript:filter([null, null, null, [new Date(2001, 0, 27), new Date(2001, 0, 29)]])">weekends</a> and <a href="javascript:filter([null, null, null, [new Date(2001, 0, 29), new Date(2001, 1, 3)]])">weekdays</a>, or <a href="javascript:filter([[4, 7], null, null, null])">mornings</a> and <a href="javascript:filter([[21, 24], null, null, null])">nights</a>? <a href="https://github.com/square/crossfilter/tree/gh-pages">Fork this example</a> and try your own data! -->
-
-
 
   <div id="hgba1c-chart" class="chart">
     <div class="title">A1C</div>
@@ -136,7 +56,7 @@ aside {
     <div id="bmi-chart" class="chart">
     <div class="title">BMI</div>
   </div>
-  <div id="ldl-chart" class="chart">
+<!--   <div id="ldl-chart" class="chart">
     <div class="title">LDL</div>
   </div>
     <div id="hdl-chart" class="chart">
@@ -152,14 +72,17 @@ aside {
     <div class="title">Diastolic</div>
   </div>
       <div id="pulse-chart" class="chart">
-    <div class="title">Pulse</div>
+    <div class="title">Pulse</div> -->
   </div>
 
 
 <div id="totals"><span id="active">-</span> of <span id="total">-</span> patients selected.</div>
 
 <div id="lists">
-  <div id="pt-list" class="list"></div>
+  <table id="pt-list" class="list">
+    <thead><th>Patient ID</th></thead>
+    <tbody></tbody>
+  </table>
 </div>
 
 </div>
@@ -195,10 +118,10 @@ d3.csv("pt.csv", function(error, pts) {
 
   function clean(d){
     if(isNaN(d)){
-      d = -100;
+      d = 0;
     }
     if(d === ""){
-      d = -100;
+      d = 0;
     }
     return d;
   }
@@ -209,9 +132,9 @@ d3.csv("pt.csv", function(error, pts) {
       all = pt.groupAll(),
       ptid = pt.dimension(function(d){ return d.PID}),
       hgba1c = pt.dimension(function(d) { 
-        return Math.max(-10-100, Math.min(15, clean(d.hgba1c)))}),
+        return Math.max(-100, Math.min(15, clean(d.hgba1c)))}),
       hgba1cs = hgba1c.group(function(d) { return Math.floor((clean(d)/.5))*.5; });
-      bmi = pt.dimension(function(d) { return Math.max(-100, Math.min(70, clean(d.bmi))); }),
+      bmi = pt.dimension(function(d) { return Math.max(-100, Math.min(60, clean(d.bmi))); }),
       bmis = bmi.group(function(d) { return Math.floor(clean(d)/2)*2; });
       ldl = pt.dimension(function(d) { 
         return Math.min(300, clean(d.ldl)); }),
@@ -252,8 +175,8 @@ d3.csv("pt.csv", function(error, pts) {
         .dimension(bmi)
         .group(bmis)
         .x(d3.scale.linear()
-        .domain([0, 70])
-        .rangeRound([0, 10 * 35])),  
+        .domain([0, 60])
+        .rangeRound([0, 10 * 30])),  
 
     barChart()
         .dimension(ldl)
@@ -349,6 +272,12 @@ d3.csv("pt.csv", function(error, pts) {
 
   function ptList(div) {
     var patients = ptid.top(100);
+    var ptList = $('#pt-list')
+    ptList.select("tbody").find("tr").remove()
+
+    for(var i in patients) {
+      ptList.append("<tr><td>" + patients[i].hgba1c + "</td></tr>")
+    }
   }
 
   function barChart() {
@@ -423,7 +352,8 @@ d3.csv("pt.csv", function(error, pts) {
               .attr("y", height + 40)
               .datum(group.all())
               .text(function(d) {
-                return (all.value() - d[0].value) / all.value() * 100 + "%"})
+                var percent = Math.floor((all.value() - d[0].value) / all.value() * 100)
+                return percent + "% have non-zero data"})
 
 
 
