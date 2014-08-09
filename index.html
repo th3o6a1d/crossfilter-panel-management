@@ -158,12 +158,26 @@ aside {
   <div id="hgba1c-chart" class="chart">
     <div class="title">A1C</div>
   </div>
-  <br>
     <div id="bmi-chart" class="chart">
     <div class="title">BMI</div>
   </div>
   <div id="ldl-chart" class="chart">
     <div class="title">LDL</div>
+  </div>
+    <div id="hdl-chart" class="chart">
+    <div class="title">HDL</div>
+  </div>
+    <div id="triglycerides-chart" class="chart">
+    <div class="title">Triglycerides</div>
+  </div>
+      <div id="systolic-chart" class="chart">
+    <div class="title">Systolic</div>
+  </div>
+      <div id="diastolic-chart" class="chart">
+    <div class="title">Diastolic</div>
+  </div>
+      <div id="pulse-chart" class="chart">
+    <div class="title">Pulse</div>
   </div>
 </div>
 
@@ -206,6 +220,9 @@ d3.csv("pt.csv", function(error, pts) {
     if(isNaN(d)){
       d = null;
     }
+    if(d===0){
+      d = null;
+    }
     return d;
   }
 
@@ -219,16 +236,20 @@ d3.csv("pt.csv", function(error, pts) {
       // hours = hour.group(Math.floor),
       // delay = flight.dimension(function(d) { return Math.max(-60, Math.min(149, d.delay)); }),
       // delays = delay.group(function(d) { return Math.floor(d / 10) * 10; }),
-      hgba1c = pt.dimension(function(d) { 
+      hgba1c = pt.dimension(function(d) { return Math.max(0, Math.min(15, clean(d.hgba1c)))}),
+      hgba1cs = hgba1c.group(function(d) { return Math.floor((clean(d)/.5))*.5; });
+      bmi = pt.dimension(function(d) { return Math.max(0, Math.min(70, clean(d.bmi))); }),
+      bmis = bmi.group(function(d) { return Math.floor(clean(d)/2)*2; });
+      ldl = pt.dimension(function(d) { 
+        return Math.max(0, Math.min(300, clean(d.ldl))); }),
+      ldls = ldl.group(function(d) { 
+        return Math.floor((clean(d)/10))*10; });
+      hdl = pt.dimension(function(d) { 
+        return Math.max(0, Math.min(300, clean(d.hdl))); }),
+      hdls = hdl.group(function(d) { 
+        console.log(clean(d))
+        return Math.floor((clean(d)/10))*10; });
 
-        return Math.max(0, Math.min(15, clean(d.hgba1c)))}),
-      hgba1cs = hgba1c.group(function(d) { 
-        console.log(Math.floor(clean(d)))
-        return clean(d); });
-      bmi = pt.dimension(function(d) { return clean(d.bmi); }),
-      bmis = bmi.group(function(d) { return Math.floor(clean(d)); });
-      ldl = pt.dimension(function(d) { return clean(d.ldl); }),
-      ldls = ldl.group(function(d) { return Math.floor(clean(d)); });
 
   var charts = [
 
@@ -251,21 +272,28 @@ d3.csv("pt.csv", function(error, pts) {
         .group(hgba1cs)
         .x(d3.scale.linear()
         .domain([2, 15])
-        .rangeRound([0, 10 * 130])),
+        .rangeRound([0, 10 * 26])),
 
-    // barChart()
-    //     .dimension(bmi)
-    //     .group(bmis)
-    //     .x(d3.scale.linear()
-    //     .domain([10, 70])
-    //     .rangeRound([0, 10 * 24])),  
+    barChart()
+        .dimension(bmi)
+        .group(bmis)
+        .x(d3.scale.linear()
+        .domain([10, 70])
+        .rangeRound([0, 10 * 30])),  
 
-    // barChart()
-    //     .dimension(ldl)
-    //     .group(ldls)
-    //     .x(d3.scale.linear()
-    //     .domain([20, 250])
-    //     .rangeRound([0, 10 * 24])),   
+    barChart()
+        .dimension(ldl)
+        .group(ldls)
+        .x(d3.scale.linear()
+        .domain([20, 300])
+        .rangeRound([0, 10 * 30])),   
+
+    barChart()
+        .dimension(hdl)
+        .group(hdls)
+        .x(d3.scale.linear()
+        .domain([0, 150])
+        .rangeRound([0, 10 * 15])),   
 
 
     // barChart()
