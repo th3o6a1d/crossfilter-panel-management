@@ -3,55 +3,10 @@
 <title>Crossfilter</title>
 <style>
 
-body {
-  font-family: "Helvetica Neue";
-  margin: 40px auto;
-  width: 960px;
-  min-height: 2000px;
-}
-
-#body {
-  position: relative;
-}
-
-footer {
-  padding: 2em 0 1em 0;
-  font-size: 12px;
-}
-
-h1 {
-  font-size: 96px;
-  margin-top: .3em;
-  margin-bottom: 0;
-}
-
-h1 + h2 {
-  margin-top: 0;
-}
-
-h2 {
-  font-weight: 400;
-  font-size: 28px;
-}
-
-h1, h2 {
-  font-family: "Yanone Kaffeesatz";
-  text-rendering: optimizeLegibility;
-}
-
-#body > p {
-  line-height: 1.5em;
-  width: 640px;
-  text-rendering: optimizeLegibility;
-}
-
-#charts {
-  padding: 10px 0;
-}
 
 .chart {
   display: inline-block;
-  height: 151px;
+  height: 160px;
   margin-bottom: 20px;
 }
 
@@ -90,13 +45,32 @@ h1, h2 {
 }
 
 #hgba1c-chart {
+  width: 330px;
+}
+
+#bmi-chart {
+  width: 400px;
+}
+
+#ldl-chart {
+  width: 330px;
+}
+
+#hdl-chart {
+  width: 330px;
+}
+#tri-chart {
+  width: 300px;
+}
+#sys-chart {
+  width: 330px;
+}
+#dia-chart {
   width: 260px;
 }
-
-#delay-chart {
-  width: 230px;
+#pulse-chart {
+  width: 330px;
 }
-
 #distance-chart {
   width: 420px;
 }
@@ -105,39 +79,39 @@ h1, h2 {
   width: 920px;
 }
 
-#flight-list {
+#pt-list {
   min-height: 1024px;
 }
 
-#flight-list .date,
-#flight-list .day {
+#pt-list .date,
+#pt-list .day {
   margin-bottom: .4em;
 }
 
-#flight-list .flight {
+#pt-list .flight {
   line-height: 1.5em;
   background: #eee;
   width: 640px;
   margin-bottom: 1px;
 }
 
-#flight-list .time {
+#pt-list .time {
   color: #999;
 }
 
-#flight-list .flight div {
+#pt-list .flight div {
   display: inline-block;
   width: 100px;
 }
 
-#flight-list div.distance,
-#flight-list div.delay {
+#pt-list div.distance,
+#pt-list div.delay {
   width: 160px;
   padding-right: 10px;
   text-align: right;
 }
 
-#flight-list .early {
+#pt-list .early {
   color: green;
 }
 
@@ -154,7 +128,8 @@ aside {
  -->
 <!-- <p>Some questions to consider: How does time-of-day correlate with <a href="javascript:filter([null, [100, 150], null, null])">arrival delay</a>? Are <a href="javascript:filter([null, null, [1700, 2000], null])">longer</a> or <a href="javascript:filter([null, null, [0, 300], null])">shorter</a> flights more likely to arrive early? What happened on <a href="javascript:filter([null, [80, 150], null, [new Date(2001, 0, 12), new Date(2001, 0, 13)]])">January 12</a>? How do flight patterns differ between <a href="javascript:filter([null, null, null, [new Date(2001, 0, 27), new Date(2001, 0, 29)]])">weekends</a> and <a href="javascript:filter([null, null, null, [new Date(2001, 0, 29), new Date(2001, 1, 3)]])">weekdays</a>, or <a href="javascript:filter([[4, 7], null, null, null])">mornings</a> and <a href="javascript:filter([[21, 24], null, null, null])">nights</a>? <a href="https://github.com/square/crossfilter/tree/gh-pages">Fork this example</a> and try your own data! -->
 
-<div id="charts">
+
+
   <div id="hgba1c-chart" class="chart">
     <div class="title">A1C</div>
   </div>
@@ -167,24 +142,24 @@ aside {
     <div id="hdl-chart" class="chart">
     <div class="title">HDL</div>
   </div>
-    <div id="triglycerides-chart" class="chart">
+    <div id="tri-chart" class="chart">
     <div class="title">Triglycerides</div>
   </div>
-      <div id="systolic-chart" class="chart">
+      <div id="sys-chart" class="chart">
     <div class="title">Systolic</div>
   </div>
-      <div id="diastolic-chart" class="chart">
+      <div id="dia-chart" class="chart">
     <div class="title">Diastolic</div>
   </div>
       <div id="pulse-chart" class="chart">
     <div class="title">Pulse</div>
   </div>
-</div>
 
-<aside id="totals"><span id="active">-</span> of <span id="total">-</span> flights selected.</aside>
+
+<div id="totals"><span id="active">-</span> of <span id="total">-</span> patients selected.</div>
 
 <div id="lists">
-  <div id="flight-list" class="list"></div>
+  <div id="pt-list" class="list"></div>
 </div>
 
 </div>
@@ -218,10 +193,10 @@ d3.csv("pt.csv", function(error, pts) {
 
   function clean(d){
     if(isNaN(d)){
-      d = null;
+      d = -100;
     }
-    if(d===0){
-      d = null;
+    if(d === ""){
+      d = -100;
     }
     return d;
   }
@@ -230,88 +205,94 @@ d3.csv("pt.csv", function(error, pts) {
   // Create the crossfilter for the relevant dimensions and groups.
   var pt = crossfilter(pts),
       all = pt.groupAll(),
-      // date = flight.dimension(function(d) { return d.date; }),
-      // dates = date.group(d3.time.day),
-      // hour = flight.dimension(function(d) { return d.date.getHours() + d.date.getMinutes() / 60; }),
-      // hours = hour.group(Math.floor),
-      // delay = flight.dimension(function(d) { return Math.max(-60, Math.min(149, d.delay)); }),
-      // delays = delay.group(function(d) { return Math.floor(d / 10) * 10; }),
-      hgba1c = pt.dimension(function(d) { return Math.max(0, Math.min(15, clean(d.hgba1c)))}),
+      hgba1c = pt.dimension(function(d) { 
+        return Math.max(-10-100, Math.min(15, clean(d.hgba1c)))}),
       hgba1cs = hgba1c.group(function(d) { return Math.floor((clean(d)/.5))*.5; });
-      bmi = pt.dimension(function(d) { return Math.max(0, Math.min(70, clean(d.bmi))); }),
+      bmi = pt.dimension(function(d) { return Math.max(-100, Math.min(70, clean(d.bmi))); }),
       bmis = bmi.group(function(d) { return Math.floor(clean(d)/2)*2; });
       ldl = pt.dimension(function(d) { 
-        return Math.max(0, Math.min(300, clean(d.ldl))); }),
+        return Math.min(300, clean(d.ldl)); }),
       ldls = ldl.group(function(d) { 
         return Math.floor((clean(d)/10))*10; });
       hdl = pt.dimension(function(d) { 
-        return Math.max(0, Math.min(300, clean(d.hdl))); }),
+        return Math.max(-100, Math.min(300, clean(d.hdl))); }),
       hdls = hdl.group(function(d) { 
-        console.log(clean(d))
+        return Math.floor((clean(d)/5))*5; });
+      tri = pt.dimension(function(d) { 
+        return Math.max(-100, Math.min(525, clean(d.triglycerides))); }),
+      tris = tri.group(function(d) { 
+        return Math.floor((clean(d)/25))*25; });
+      dia = pt.dimension(function(d) { 
+        return Math.max(-100, Math.min(525, clean(d.diastolic))); }),
+      dias = dia.group(function(d) { 
+        return Math.floor((clean(d)/10))*10; });
+      sys = pt.dimension(function(d) { 
+        return Math.max(-100, Math.min(300, clean(d.systolic))); }),
+      syss = sys.group(function(d) { 
+        return Math.floor((clean(d)/10))*10; });
+      pulse = pt.dimension(function(d) { 
+        return Math.max(-100, Math.min(200, clean(d.pulse))); }),
+      pulses = pulse.group(function(d) { 
         return Math.floor((clean(d)/10))*10; });
 
 
   var charts = [
 
-    // barChart()
-    //     .dimension(hour)
-    //     .group(hours)
-    //     .x(d3.scale.linear()
-    //     .domain([0, 24])
-    //     .rangeRound([0, 10 * 24])),
-
-    // barChart()
-    //     .dimension(delay)
-    //     .group(delays)
-    //     .x(d3.scale.linear()
-    //     .domain([-60, 150])
-    //     .rangeRound([0, 10 * 21])),
-
     barChart()
         .dimension(hgba1c)
         .group(hgba1cs)
         .x(d3.scale.linear()
-        .domain([2, 15])
-        .rangeRound([0, 10 * 26])),
+        .domain([0, 15])
+        .rangeRound([0, 10 * 30])),
 
     barChart()
         .dimension(bmi)
         .group(bmis)
         .x(d3.scale.linear()
-        .domain([10, 70])
-        .rangeRound([0, 10 * 30])),  
+        .domain([0, 70])
+        .rangeRound([0, 10 * 35])),  
 
     barChart()
         .dimension(ldl)
         .group(ldls)
         .x(d3.scale.linear()
-        .domain([20, 300])
+        .domain([0, 300])
         .rangeRound([0, 10 * 30])),   
 
     barChart()
         .dimension(hdl)
         .group(hdls)
         .x(d3.scale.linear()
-        .domain([0, 150])
-        .rangeRound([0, 10 * 15])),   
+        .domain([0, 130])
+        .rangeRound([0, 10 * 26])),   
 
+    barChart()
+        .dimension(tri)
+        .group(tris)
+        .x(d3.scale.linear()
+        .domain([0, 550])
+        .rangeRound([0, 10 * 22])),   
 
-    // barChart()
-    //   .dimension(distance)
-    //   .group(distances)
-    //   .x(d3.scale.linear()
-    //   .domain([0, 2000])
-    //   .rangeRound([0, 10 * 40])),
+    barChart()
+        .dimension(sys)
+        .group(syss)
+        .x(d3.scale.linear()
+        .domain([0, 300])
+        .rangeRound([0, 10 * 30])),   
 
+    barChart()
+        .dimension(dia)
+        .group(dias)
+        .x(d3.scale.linear()
+        .domain([0, 200])
+        .rangeRound([0, 10 * 20])),  
 
-    // barChart()
-    //     .dimension(date)
-    //     .group(dates)
-    //     .round(d3.time.day.round)
-    //     .x(d3.time.scale()
-    //     .domain([new Date(2001, 0, 1), new Date(2001, 3, 1)])
-    //     .rangeRound([0, 10 * 90]))
-    //     .filter([new Date(2001, 1, 1), new Date(2001, 2, 1)])
+    barChart()
+        .dimension(pulse)
+        .group(pulses)
+        .x(d3.scale.linear()
+        .domain([0, 200])
+        .rangeRound([0, 10 * 22])),  
 
   ];
 
@@ -323,8 +304,8 @@ d3.csv("pt.csv", function(error, pts) {
       .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
 
   // // Render the initial lists.
-  // var list = d3.selectAll(".list")
-  //     .data([flightList]);
+  var list = d3.selectAll(".list")
+      .data([ptList]);
 
   // Render the total.
   d3.selectAll("#total")
@@ -363,7 +344,7 @@ d3.csv("pt.csv", function(error, pts) {
     renderAll();
   };
 
-  function flightList(div) {
+  function ptList(div) {
     var flightsByDate = nestByDate.entries(date.top(40));
 
     div.each(function() {
