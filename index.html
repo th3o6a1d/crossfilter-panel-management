@@ -49,9 +49,15 @@
 
 <!-- <p>Headers: PID,Age,Gender,source_of_payment,race,Diabetic,Hypertensive,Obese,has_anemia,has_asthma,has_chf,has_crf,has_cva,has_copd,annual_household_income,hgba1c,bmi,ht,wt,plat,rbc,wbc,triglycerides,ldl,hdl,diastolic,systolic,pulse</p>
  -->
-<!-- <p>Some questions to consider: How does time-of-day correlate with <a href="javascript:filter([null, [100, 150], null, null])">arrival delay</a>? Are <a href="javascript:filter([null, null, [1700, 2000], null])">longer</a> or <a href="javascript:filter([null, null, [0, 300], null])">shorter</a> flights more likely to arrive early? What happened on <a href="javascript:filter([null, [80, 150], null, [new Date(2001, 0, 12), new Date(2001, 0, 13)]])">January 12</a>? How do flight patterns differ between <a href="javascript:filter([null, null, null, [new Date(2001, 0, 27), new Date(2001, 0, 29)]])">weekends</a> and <a href="javascript:filter([null, null, null, [new Date(2001, 0, 29), new Date(2001, 1, 3)]])">weekdays</a>, or <a href="javascript:filter([[4, 7], null, null, null])">mornings</a> and <a href="javascript:filter([[21, 24], null, null, null])">nights</a>? <a href="https://github.com/square/crossfilter/tree/gh-pages">Fork this example</a> and try your own data! -->
+
 <div class="container">
   <h2>Virtual Practice Crossfilter</h2>
+
+  <p>Explore your panel: <br>What does a typical <a href="javascript:filter([[5.7,6.5], null, null, null, null, null, null, null])">pre-diabetic</a> (HgbA1C 5.7<6.5) patient look like? <br>
+
+    Who are among the patients who have <a href="javascript:filter([null, [0,2], null, null, null, null, null, null])"><b>not</b></a> had their BMI calculated recently? 
+
+
   <div id="hgba1c-chart" class="chart">
     <div class="title">A1C</div>
   </div>
