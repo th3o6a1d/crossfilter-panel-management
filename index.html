@@ -53,6 +53,9 @@
   <p>Explore your panel: <br>What does a typical <a href="javascript:filter([[5.7,6.5], null, null, null, null, null, null, null])">pre-diabetic</a> (HgbA1C 5.7<6.5) patient look like? <br>Who are among the patients who have <a href="javascript:filter([null, [0,2], null, null, null, null, null, null])"><b>not</b></a> had their BMI calculated recently? 
 
 
+    <div id="totals"><span id="active">-</span> of <span id="total">-</span> patients selected.</div>
+    <br>
+
     <div id="hgba1c-chart" class="chart">
       <div class="title">A1C</div>
     </div>
@@ -79,7 +82,6 @@
     </div>
 
 
-    <div id="totals"><span id="active">-</span> of <span id="total">-</span> patients selected.</div>
 
     <div id="lists">
       <h3>Sample of Filtered Patients</h3>
@@ -290,10 +292,8 @@ d3.csv("pt.csv", function(error, pts) {
     var ptList = $('#pt-list')
 
     ptList.find("tbody").find("tr").remove()
-    console.log(patients)
+    console.log(ptid)
     for(var i in patients) {
-
-
 
       if(patients[i].Gender === "1"){
         var gender = "Male"
