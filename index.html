@@ -47,69 +47,64 @@
 
 </style>
 
-<!-- <p>Headers: PID,Age,Gender,source_of_payment,race,Diabetic,Hypertensive,Obese,has_anemia,has_asthma,has_chf,has_crf,has_cva,has_copd,annual_household_income,hgba1c,bmi,ht,wt,plat,rbc,wbc,triglycerides,ldl,hdl,diastolic,systolic,pulse</p>
- -->
-
 <div class="container">
   <h2>Virtual Practice Crossfilter</h2>
 
-  <p>Explore your panel: <br>What does a typical <a href="javascript:filter([[5.7,6.5], null, null, null, null, null, null, null])">pre-diabetic</a> (HgbA1C 5.7<6.5) patient look like? <br>
-
-    Who are among the patients who have <a href="javascript:filter([null, [0,2], null, null, null, null, null, null])"><b>not</b></a> had their BMI calculated recently? 
+  <p>Explore your panel: <br>What does a typical <a href="javascript:filter([[5.7,6.5], null, null, null, null, null, null, null])">pre-diabetic</a> (HgbA1C 5.7<6.5) patient look like? <br>Who are among the patients who have <a href="javascript:filter([null, [0,2], null, null, null, null, null, null])"><b>not</b></a> had their BMI calculated recently? 
 
 
-  <div id="hgba1c-chart" class="chart">
-    <div class="title">A1C</div>
-  </div>
+    <div id="hgba1c-chart" class="chart">
+      <div class="title">A1C</div>
+    </div>
     <div id="bmi-chart" class="chart">
-    <div class="title">BMI</div>
-  </div>
-  <div id="ldl-chart" class="chart">
-    <div class="title">LDL</div>
-  </div>
+      <div class="title">BMI</div>
+    </div>
+    <div id="ldl-chart" class="chart">
+      <div class="title">LDL</div>
+    </div>
     <div id="hdl-chart" class="chart">
-    <div class="title">HDL</div>
-  </div>
+      <div class="title">HDL</div>
+    </div>
     <div id="tri-chart" class="chart">
-    <div class="title">Triglycerides</div>
-  </div>
-      <div id="sys-chart" class="chart">
-    <div class="title">Systolic</div>
-  </div>
-      <div id="dia-chart" class="chart">
-    <div class="title">Diastolic</div>
-  </div>
-      <div id="pulse-chart" class="chart">
-    <div class="title">Pulse</div>
-  </div>
+      <div class="title">Triglycerides</div>
+    </div>
+    <div id="sys-chart" class="chart">
+      <div class="title">Systolic</div>
+    </div>
+    <div id="dia-chart" class="chart">
+      <div class="title">Diastolic</div>
+    </div>
+    <div id="pulse-chart" class="chart">
+      <div class="title">Pulse</div>
+    </div>
 
 
-<div id="totals"><span id="active">-</span> of <span id="total">-</span> patients selected.</div>
+    <div id="totals"><span id="active">-</span> of <span id="total">-</span> patients selected.</div>
 
-<div id="lists">
-  <h3>Sample of Filtered Patients</h3>
-  <table id="pt-list" class="list table table-condensed">
-    <thead>
-      <th>Age</th>
-      <th>Gender</th>
-      <th>Insurance</th>
-      <th>Race</th>
-      <th>Income</th>
-      <th>DM</th>
-      <th>HTN</th>
-      <th>Obesity</th>
-      <th>Anemia</th>
-      <th>CHF</th>
-      <th>Asthma</th>
-      <th>COPD</th>
-      <th>CRF</th>
-      <th>CVA</th>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
+    <div id="lists">
+      <h3>Sample of Filtered Patients</h3>
+      <table id="pt-list" class="list table table-condensed">
+        <thead>
+          <th>Age</th>
+          <th>Gender</th>
+          <th>Insurance</th>
+          <th>Race</th>
+          <th>Income</th>
+          <th>DM</th>
+          <th>HTN</th>
+          <th>Obesity</th>
+          <th>Anemia</th>
+          <th>CHF</th>
+          <th>Asthma</th>
+          <th>COPD</th>
+          <th>CRF</th>
+          <th>CVA</th>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
-</div>
+  </div>
 </div>
 
 <script src="crossfilter.v1.min.js"></script>
@@ -117,21 +112,17 @@
 <script src="jquery-2.1.1.js"></script>
 <script>
 
-// (It's CSV, but GitHub Pages only gzip's JSON at the moment.)
+
 d3.csv("pt.csv", function(error, pts) {
 
-  // console.log(pts)
-  // Various formatters.
   var formatNumber = d3.format(",d"),
-      formatChange = d3.format("+,d"),
-      formatDate = d3.time.format("%B %d, %Y"),
-      formatTime = d3.time.format("%I:%M %p");
-
-  // A nest operator, for grouping the flight list.
+  formatChange = d3.format("+,d"),
+  formatDate = d3.time.format("%B %d, %Y"),
+  formatTime = d3.time.format("%I:%M %p");
   var nestByDate = d3.nest()
-      .key(function(d) { return d3.time.day(d.date); });
+  .key(function(d) { return d3.time.day(d.date); });
 
-  // A little coercion, since the CSV is untyped.
+
   pts.forEach(function(d, i) {
     d.index = i;
     d.hgba1c = d.hgba1c;
@@ -153,96 +144,96 @@ d3.csv("pt.csv", function(error, pts) {
 
   // Create the crossfilter for the relevant dimensions and groups.
   var pt = crossfilter(pts),
-      all = pt.groupAll(),
-      ptid = pt.dimension(function(d){ return d.PID}),
-      hgba1c = pt.dimension(function(d) { 
-        return Math.max(-100, Math.min(15, clean(d.hgba1c)))}),
-      hgba1cs = hgba1c.group(function(d) { return Math.floor((clean(d)/.5))*.5; });
-      bmi = pt.dimension(function(d) { return Math.max(-100, Math.min(60, clean(d.bmi))); }),
-      bmis = bmi.group(function(d) { return Math.floor(clean(d)/2)*2; });
-      ldl = pt.dimension(function(d) { 
-        return Math.min(300, clean(d.ldl)); }),
-      ldls = ldl.group(function(d) { 
-        return Math.floor((clean(d)/10))*10; });
-      hdl = pt.dimension(function(d) { 
-        return Math.max(-100, Math.min(300, clean(d.hdl))); }),
-      hdls = hdl.group(function(d) { 
-        return Math.floor((clean(d)/5))*5; });
-      tri = pt.dimension(function(d) { 
-        return Math.max(-100, Math.min(525, clean(d.triglycerides))); }),
-      tris = tri.group(function(d) { 
-        return Math.floor((clean(d)/25))*25; });
-      dia = pt.dimension(function(d) { 
-        return Math.max(-100, Math.min(525, clean(d.diastolic))); }),
-      dias = dia.group(function(d) { 
-        return Math.floor((clean(d)/10))*10; });
-      sys = pt.dimension(function(d) { 
-        return Math.max(-100, Math.min(300, clean(d.systolic))); }),
-      syss = sys.group(function(d) { 
-        return Math.floor((clean(d)/10))*10; });
-      pulse = pt.dimension(function(d) { 
-        return Math.max(-100, Math.min(200, clean(d.pulse))); }),
-      pulses = pulse.group(function(d) { 
-        return Math.floor((clean(d)/10))*10; });
+  all = pt.groupAll(),
+  ptid = pt.dimension(function(d){ return d.PID}),
+  hgba1c = pt.dimension(function(d) { 
+    return Math.max(-100, Math.min(15, clean(d.hgba1c)))}),
+  hgba1cs = hgba1c.group(function(d) { return Math.floor((clean(d)/.5))*.5; });
+  bmi = pt.dimension(function(d) { return Math.max(-100, Math.min(60, clean(d.bmi))); }),
+  bmis = bmi.group(function(d) { return Math.floor(clean(d)/2)*2; });
+  ldl = pt.dimension(function(d) { 
+    return Math.min(300, clean(d.ldl)); }),
+  ldls = ldl.group(function(d) { 
+    return Math.floor((clean(d)/10))*10; });
+  hdl = pt.dimension(function(d) { 
+    return Math.max(-100, Math.min(300, clean(d.hdl))); }),
+  hdls = hdl.group(function(d) { 
+    return Math.floor((clean(d)/5))*5; });
+  tri = pt.dimension(function(d) { 
+    return Math.max(-100, Math.min(525, clean(d.triglycerides))); }),
+  tris = tri.group(function(d) { 
+    return Math.floor((clean(d)/25))*25; });
+  dia = pt.dimension(function(d) { 
+    return Math.max(-100, Math.min(525, clean(d.diastolic))); }),
+  dias = dia.group(function(d) { 
+    return Math.floor((clean(d)/10))*10; });
+  sys = pt.dimension(function(d) { 
+    return Math.max(-100, Math.min(300, clean(d.systolic))); }),
+  syss = sys.group(function(d) { 
+    return Math.floor((clean(d)/10))*10; });
+  pulse = pt.dimension(function(d) { 
+    return Math.max(-100, Math.min(200, clean(d.pulse))); }),
+  pulses = pulse.group(function(d) { 
+    return Math.floor((clean(d)/10))*10; });
 
 
   var charts = [
 
-    barChart()
-        .dimension(hgba1c)
-        .group(hgba1cs)
-        .x(d3.scale.linear()
-        .domain([0, 15])
-        .rangeRound([0, 10 * 30])),
+  barChart()
+  .dimension(hgba1c)
+  .group(hgba1cs)
+  .x(d3.scale.linear()
+    .domain([0, 15])
+    .rangeRound([0, 10 * 30])),
 
-    barChart()
-        .dimension(bmi)
-        .group(bmis)
-        .x(d3.scale.linear()
-        .domain([0, 60])
-        .rangeRound([0, 10 * 30])),  
+  barChart()
+  .dimension(bmi)
+  .group(bmis)
+  .x(d3.scale.linear()
+    .domain([0, 60])
+    .rangeRound([0, 10 * 30])),  
 
-    barChart()
-        .dimension(ldl)
-        .group(ldls)
-        .x(d3.scale.linear()
-        .domain([0, 300])
-        .rangeRound([0, 10 * 30])),   
+  barChart()
+  .dimension(ldl)
+  .group(ldls)
+  .x(d3.scale.linear()
+    .domain([0, 300])
+    .rangeRound([0, 10 * 30])),   
 
-    barChart()
-        .dimension(hdl)
-        .group(hdls)
-        .x(d3.scale.linear()
-        .domain([0, 130])
-        .rangeRound([0, 10 * 26])),   
+  barChart()
+  .dimension(hdl)
+  .group(hdls)
+  .x(d3.scale.linear()
+    .domain([0, 130])
+    .rangeRound([0, 10 * 26])),   
 
-    barChart()
-        .dimension(tri)
-        .group(tris)
-        .x(d3.scale.linear()
-        .domain([0, 550])
-        .rangeRound([0, 10 * 22])),   
+  barChart()
+  .dimension(tri)
+  .group(tris)
+  .x(d3.scale.linear()
+    .domain([0, 550])
+    .rangeRound([0, 10 * 22])),   
 
-    barChart()
-        .dimension(sys)
-        .group(syss)
-        .x(d3.scale.linear()
-        .domain([0, 300])
-        .rangeRound([0, 10 * 30])),   
+  barChart()
+  .dimension(sys)
+  .group(syss)
+  .x(d3.scale.linear()
+    .domain([0, 300])
+    .rangeRound([0, 10 * 30])),   
 
-    barChart()
-        .dimension(dia)
-        .group(dias)
-        .x(d3.scale.linear()
-        .domain([0, 200])
-        .rangeRound([0, 10 * 20])),  
+  barChart()
+  .dimension(dia)
+  .group(dias)
+  .x(d3.scale.linear()
+    .domain([0, 200])
+    .rangeRound([0, 10 * 20])),  
 
-    barChart()
-        .dimension(pulse)
-        .group(pulses)
-        .x(d3.scale.linear()
-        .domain([0, 200])
-        .rangeRound([0, 10 * 22])),  
+  barChart()
+  .dimension(pulse)
+  .group(pulses)
+  .x(d3.scale.linear()
+    .domain([0, 200])
+    .rangeRound([0, 10 * 22])),  
 
   ];
 
@@ -250,16 +241,16 @@ d3.csv("pt.csv", function(error, pts) {
   // .chart elements in the DOM, bind the charts to the DOM and render them.
   // We also listen to the chart's brush events to update the display.
   var chart = d3.selectAll(".chart")
-      .data(charts)
-      .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
+  .data(charts)
+  .each(function(chart) { chart.on("brush", renderAll).on("brushend", renderAll); });
 
   // // Render the initial lists.
   var list = d3.selectAll(".list")
-      .data([ptList]);
+  .data([ptList]);
 
   // Render the total.
   d3.selectAll("#total")
-      .text(formatNumber(pt.size()));
+  .text(formatNumber(pt.size()));
 
   renderAll();
 
@@ -278,10 +269,10 @@ d3.csv("pt.csv", function(error, pts) {
   // Like d3.time.format, but faster.
   function parseDate(d) {
     return new Date(2001,
-        d.substring(0, 2) - 1,
-        d.substring(2, 4),
-        d.substring(4, 6),
-        d.substring(6, 8));
+      d.substring(0, 2) - 1,
+      d.substring(2, 4),
+      d.substring(4, 6),
+      d.substring(6, 8));
   }
 
   window.filter = function(filters) {
@@ -395,60 +386,60 @@ d3.csv("pt.csv", function(error, pts) {
     if (!barChart.id) barChart.id = 0;
 
     var margin = {top: 10, right: 10, bottom: 80, left: 10},
-        x,
-        y = d3.scale.linear().range([100, 0]),
-        id = barChart.id++,
-        axis = d3.svg.axis().orient("bottom"),
-        brush = d3.svg.brush(),
-        brushDirty,
-        dimension,
-        group,
-        round;
+    x,
+    y = d3.scale.linear().range([100, 0]),
+    id = barChart.id++,
+    axis = d3.svg.axis().orient("bottom"),
+    brush = d3.svg.brush(),
+    brushDirty,
+    dimension,
+    group,
+    round;
 
 
     function chart(div) {
       var width = x.range()[1],
-          height = y.range()[0];
+      height = y.range()[0];
 
       y.domain([0, group.top(1)[0].value]);
 
       div.each(function() {
         var div = d3.select(this),
-            g = div.select("g");
+        g = div.select("g");
 
         // Create the skeletal chart.
         if (g.empty()) {
           div.select(".title").append("a")
-              .attr("href", "javascript:reset(" + id + ")")
-              .attr("class", "reset")
-              .text("reset")
-              .style("display", "none");
+          .attr("href", "javascript:reset(" + id + ")")
+          .attr("class", "reset")
+          .text("reset")
+          .style("display", "none");
 
           g = div.append("svg")
-              .attr("width", width + margin.left + margin.right)
-              .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
           g.append("clipPath")
-              .attr("id", "clip-" + id)
-            .append("rect")
-              .attr("width", width)
-              .attr("height", height);
+          .attr("id", "clip-" + id)
+          .append("rect")
+          .attr("width", width)
+          .attr("height", height);
 
           g.selectAll(".bar")
-              .data(["background", "foreground"])
-            .enter().append("path")
-              .attr("class", function(d) { return d + " bar"; })
-              .datum(group.all());
+          .data(["background", "foreground"])
+          .enter().append("path")
+          .attr("class", function(d) { return d + " bar"; })
+          .datum(group.all());
 
           g.selectAll(".foreground.bar")
-              .attr("clip-path", "url(#clip-" + id + ")");
+          .attr("clip-path", "url(#clip-" + id + ")");
 
           g.append("g")
-              .attr("class", "axis")
-              .attr("transform", "translate(0," + height + ")")
-              .call(axis);
+          .attr("class", "axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(axis);
 
           var topLeft = g.append("g")
 
@@ -459,12 +450,12 @@ d3.csv("pt.csv", function(error, pts) {
           //     .attr("r", function(d) { return d[0].value / 75})
           
           topLeft.append("text")
-              .attr("x", 0)
-              .attr("y", height + 40)
-              .datum(group.all())
-              .text(function(d) {
-                var percent = Math.floor((all.value() - d[0].value) / all.value() * 100)
-                return percent + "% have non-zero data"})
+          .attr("x", 0)
+          .attr("y", height + 40)
+          .datum(group.all())
+          .text(function(d) {
+            var percent = Math.floor((all.value() - d[0].value) / all.value() * 100)
+            return percent + "% have non-zero data"})
 
 
 
@@ -481,125 +472,125 @@ d3.csv("pt.csv", function(error, pts) {
           div.select(".title a").style("display", brush.empty() ? "none" : null);
           if (brush.empty()) {
             g.selectAll("#clip-" + id + " rect")
-                .attr("x", 0)
-                .attr("width", width);
+            .attr("x", 0)
+            .attr("width", width);
           } else {
             var extent = brush.extent();
             g.selectAll("#clip-" + id + " rect")
-                .attr("x", x(extent[0]))
-                .attr("width", x(extent[1]) - x(extent[0]));
+            .attr("x", x(extent[0]))
+            .attr("width", x(extent[1]) - x(extent[0]));
           }
         }
         g.selectAll(".bar").attr("d", barPath);
       });
 
-      function barPath(groups) {
-        var path = [],
-            i = -1,
-            n = groups.length,
-            d;
-        while (++i < n) {
-          d = groups[i];
-          path.push("M", x(d.key), ",", height, "V", y(d.value), "h9V", height);
-        }
-        return path.join("");
-      }
-
-      function resizePath(d) {
-        var e = +(d == "e"),
-            x = e ? 1 : -1,
-            y = height / 3;
-        return "M" + (.5 * x) + "," + y
-            + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6)
-            + "V" + (2 * y - 6)
-            + "A6,6 0 0 " + e + " " + (.5 * x) + "," + (2 * y)
-            + "Z"
-            + "M" + (2.5 * x) + "," + (y + 8)
-            + "V" + (2 * y - 8)
-            + "M" + (4.5 * x) + "," + (y + 8)
-            + "V" + (2 * y - 8);
-      }
-    }
-
-    brush.on("brushstart.chart", function() {
-      var div = d3.select(this.parentNode.parentNode.parentNode);
-      div.select(".title a").style("display", null);
-    });
-
-    brush.on("brush.chart", function() {
-      var g = d3.select(this.parentNode),
-          extent = brush.extent();
-      if (round) g.select(".brush")
-          .call(brush.extent(extent = extent.map(round)))
-        .selectAll(".resize")
-          .style("display", null);
-      g.select("#clip-" + id + " rect")
-          .attr("x", x(extent[0]))
-          .attr("width", x(extent[1]) - x(extent[0]));
-      dimension.filterRange(extent);
-    });
-
-    brush.on("brushend.chart", function() {
-      if (brush.empty()) {
-        var div = d3.select(this.parentNode.parentNode.parentNode);
-        div.select(".title a").style("display", "none");
-        div.select("#clip-" + id + " rect").attr("x", null).attr("width", "100%");
-        dimension.filterAll();
-      }
-    });
-
-    chart.margin = function(_) {
-      if (!arguments.length) return margin;
-      margin = _;
-      return chart;
-    };
-
-    chart.x = function(_) {
-      if (!arguments.length) return x;
-      x = _;
-      axis.scale(x);
-      brush.x(x);
-      return chart;
-    };
-
-    chart.y = function(_) {
-      if (!arguments.length) return y;
-      y = _;
-      return chart;
-    };
-
-    chart.dimension = function(_) {
-      if (!arguments.length) return dimension;
-      dimension = _;
-      return chart;
-    };
-
-    chart.filter = function(_) {
-      if (_) {
-        brush.extent(_);
-        dimension.filterRange(_);
-      } else {
-        brush.clear();
-        dimension.filterAll();
-      }
-      brushDirty = true;
-      return chart;
-    };
-
-    chart.group = function(_) {
-      if (!arguments.length) return group;
-      group = _;
-      return chart;
-    };
-
-    chart.round = function(_) {
-      if (!arguments.length) return round;
-      round = _;
-      return chart;
-    };
-
-    return d3.rebind(chart, brush, "on");
+function barPath(groups) {
+  var path = [],
+  i = -1,
+  n = groups.length,
+  d;
+  while (++i < n) {
+    d = groups[i];
+    path.push("M", x(d.key), ",", height, "V", y(d.value), "h9V", height);
   }
+  return path.join("");
+}
+
+function resizePath(d) {
+  var e = +(d == "e"),
+  x = e ? 1 : -1,
+  y = height / 3;
+  return "M" + (.5 * x) + "," + y
+  + "A6,6 0 0 " + e + " " + (6.5 * x) + "," + (y + 6)
+  + "V" + (2 * y - 6)
+  + "A6,6 0 0 " + e + " " + (.5 * x) + "," + (2 * y)
+  + "Z"
+  + "M" + (2.5 * x) + "," + (y + 8)
+  + "V" + (2 * y - 8)
+  + "M" + (4.5 * x) + "," + (y + 8)
+  + "V" + (2 * y - 8);
+}
+}
+
+brush.on("brushstart.chart", function() {
+  var div = d3.select(this.parentNode.parentNode.parentNode);
+  div.select(".title a").style("display", null);
+});
+
+brush.on("brush.chart", function() {
+  var g = d3.select(this.parentNode),
+  extent = brush.extent();
+  if (round) g.select(".brush")
+    .call(brush.extent(extent = extent.map(round)))
+  .selectAll(".resize")
+  .style("display", null);
+  g.select("#clip-" + id + " rect")
+  .attr("x", x(extent[0]))
+  .attr("width", x(extent[1]) - x(extent[0]));
+  dimension.filterRange(extent);
+});
+
+brush.on("brushend.chart", function() {
+  if (brush.empty()) {
+    var div = d3.select(this.parentNode.parentNode.parentNode);
+    div.select(".title a").style("display", "none");
+    div.select("#clip-" + id + " rect").attr("x", null).attr("width", "100%");
+    dimension.filterAll();
+  }
+});
+
+chart.margin = function(_) {
+  if (!arguments.length) return margin;
+  margin = _;
+  return chart;
+};
+
+chart.x = function(_) {
+  if (!arguments.length) return x;
+  x = _;
+  axis.scale(x);
+  brush.x(x);
+  return chart;
+};
+
+chart.y = function(_) {
+  if (!arguments.length) return y;
+  y = _;
+  return chart;
+};
+
+chart.dimension = function(_) {
+  if (!arguments.length) return dimension;
+  dimension = _;
+  return chart;
+};
+
+chart.filter = function(_) {
+  if (_) {
+    brush.extent(_);
+    dimension.filterRange(_);
+  } else {
+    brush.clear();
+    dimension.filterAll();
+  }
+  brushDirty = true;
+  return chart;
+};
+
+chart.group = function(_) {
+  if (!arguments.length) return group;
+  group = _;
+  return chart;
+};
+
+chart.round = function(_) {
+  if (!arguments.length) return round;
+  round = _;
+  return chart;
+};
+
+return d3.rebind(chart, brush, "on");
+}
 });
 
 </script>
