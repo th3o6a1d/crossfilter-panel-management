@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>Virtual Practice</title>
+<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 <style>
+
 
 .chart {
   display: inline-block;
   height: 160px;
   width: 350px;
-  margin-bottom: 20px;
 }
 
 .reset {
@@ -49,14 +50,15 @@
 <!-- <p>Headers: PID,Age,Gender,source_of_payment,race,Diabetic,Hypertensive,Obese,has_anemia,has_asthma,has_chf,has_crf,has_cva,has_copd,annual_household_income,hgba1c,bmi,ht,wt,plat,rbc,wbc,triglycerides,ldl,hdl,diastolic,systolic,pulse</p>
  -->
 <!-- <p>Some questions to consider: How does time-of-day correlate with <a href="javascript:filter([null, [100, 150], null, null])">arrival delay</a>? Are <a href="javascript:filter([null, null, [1700, 2000], null])">longer</a> or <a href="javascript:filter([null, null, [0, 300], null])">shorter</a> flights more likely to arrive early? What happened on <a href="javascript:filter([null, [80, 150], null, [new Date(2001, 0, 12), new Date(2001, 0, 13)]])">January 12</a>? How do flight patterns differ between <a href="javascript:filter([null, null, null, [new Date(2001, 0, 27), new Date(2001, 0, 29)]])">weekends</a> and <a href="javascript:filter([null, null, null, [new Date(2001, 0, 29), new Date(2001, 1, 3)]])">weekdays</a>, or <a href="javascript:filter([[4, 7], null, null, null])">mornings</a> and <a href="javascript:filter([[21, 24], null, null, null])">nights</a>? <a href="https://github.com/square/crossfilter/tree/gh-pages">Fork this example</a> and try your own data! -->
-
+<div class="container">
+  <h2>Virtual Practice Crossfilter</h2>
   <div id="hgba1c-chart" class="chart">
     <div class="title">A1C</div>
   </div>
     <div id="bmi-chart" class="chart">
     <div class="title">BMI</div>
   </div>
-<!--   <div id="ldl-chart" class="chart">
+  <div id="ldl-chart" class="chart">
     <div class="title">LDL</div>
   </div>
     <div id="hdl-chart" class="chart">
@@ -72,25 +74,41 @@
     <div class="title">Diastolic</div>
   </div>
       <div id="pulse-chart" class="chart">
-    <div class="title">Pulse</div> -->
+    <div class="title">Pulse</div>
   </div>
 
 
 <div id="totals"><span id="active">-</span> of <span id="total">-</span> patients selected.</div>
 
 <div id="lists">
-  <table id="pt-list" class="list">
-    <thead><th>Patient ID</th></thead>
+  <h3>Sample of Filtered Patients</h3>
+  <table id="pt-list" class="list table table-condensed">
+    <thead>
+      <th>Age</th>
+      <th>Gender</th>
+      <th>Insurance</th>
+      <th>Race</th>
+      <th>Income</th>
+      <th>DM</th>
+      <th>HTN</th>
+      <th>Obesity</th>
+      <th>Anemia</th>
+      <th>CHF</th>
+      <th>Asthma</th>
+      <th>COPD</th>
+      <th>CRF</th>
+      <th>CVA</th>
+    </thead>
     <tbody></tbody>
   </table>
 </div>
 
 </div>
+</div>
 
 <script src="crossfilter.v1.min.js"></script>
 <script src="d3.v3.min.js"></script>
 <script src="jquery-2.1.1.js"></script>
-<script src="jquery.dataTables.min.js"></script>
 <script>
 
 // (It's CSV, but GitHub Pages only gzip's JSON at the moment.)
@@ -120,7 +138,7 @@ d3.csv("pt.csv", function(error, pts) {
     if(isNaN(d)){
       d = 0;
     }
-    if(d === ""){
+    if(d === 0){
       d = 0;
     }
     return d;
@@ -271,12 +289,99 @@ d3.csv("pt.csv", function(error, pts) {
   };
 
   function ptList(div) {
-    var patients = ptid.top(100);
+    var patients = ptid.top(50);
     var ptList = $('#pt-list')
-    ptList.select("tbody").find("tr").remove()
 
+    ptList.find("tbody").find("tr").remove()
+    console.log(patients)
     for(var i in patients) {
-      ptList.append("<tr><td>" + patients[i].hgba1c + "</td></tr>")
+
+
+
+      if(patients[i].Gender === "1"){
+        var gender = "Male"
+      } else if(patients[i].Gender === "2") {
+        var gender = "Female"
+      }
+
+
+      if(patients[i].Diabetic === "1"){
+        var diabetic = "Yes"
+      } else {
+        var diabetic = ""
+      }
+
+      if(patients[i].Hypertensive === "1"){
+        var htn = "Yes"
+      } else {
+        var htn = ""
+      }
+
+      if(patients[i].Obese === "1"){
+        var obese = "Yes"
+      } else {
+        var obese = ""
+      }
+
+      if(patients[i].Obese === "1"){
+        var obese = "Yes"
+      } else {
+        var obese = ""
+      }
+
+      if(patients[i].has_anemia === "1"){
+        var anemic = "Yes"
+      } else {
+        var anemic = ""
+      }
+
+      if(patients[i].has_chf === "1"){
+        var chf = "Yes"
+      } else {
+        var chf = ""
+      }
+
+      if(patients[i].has_asthma === "1"){
+        var asthma = "Yes"
+      } else {
+        var asthma = ""
+      }
+
+      if(patients[i].has_copd === "1"){
+        var copd = "Yes"
+      } else {
+        var copd = ""
+      }
+
+      if(patients[i].has_crf === "1"){
+        var crf = "Yes"
+      } else {
+        var crf = ""
+      }
+
+      if(patients[i].has_cva=== "1"){
+        var cva = "Yes"
+      } else {
+        var cva = ""
+      }
+
+
+
+      ptList.append("<tr><td>" + patients[i].Age + "</td>"
+        + "<td>" + gender + "</td>"
+        + "<td>" + patients[i].source_of_payment + "</td>"
+        + "<td>" + patients[i].race + "</td>" 
+        + "<td>" + patients[i].annual_household_income + "</td>" 
+        + "<td>" + diabetic + "</td>" 
+        + "<td>" + htn + "</td>" 
+        + "<td>" + obese + "</td>" 
+        + "<td>" + anemic + "</td>" 
+        + "<td>" + chf + "</td>" 
+        + "<td>" + asthma + "</td>" 
+        + "<td>" + copd + "</td>" 
+        + "<td>" + crf + "</td>" 
+        + "<td>" + cva + "</td>" 
+        + "</tr>")
     }
   }
 
@@ -379,11 +484,7 @@ d3.csv("pt.csv", function(error, pts) {
                 .attr("width", x(extent[1]) - x(extent[0]));
           }
         }
-
         g.selectAll(".bar").attr("d", barPath);
-
-
-
       });
 
       function barPath(groups) {
